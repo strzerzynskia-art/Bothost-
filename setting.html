@@ -54,7 +54,10 @@
                 </p>
             </div>
 
-            <input type="checkbox">
+            <input
+                type="checkbox"
+                id="auto-restart"
+            >
 
         </div>
 
@@ -68,7 +71,11 @@
                 </p>
             </div>
 
-            <input type="checkbox" checked>
+            <input
+                type="checkbox"
+                id="logs"
+                checked
+            >
 
         </div>
 
@@ -82,11 +89,15 @@
                 </p>
             </div>
 
-            <input type="checkbox" checked>
+            <input
+                type="checkbox"
+                id="notifications"
+                checked
+            >
 
         </div>
 
-        <button>
+        <button data-action="save-settings">
             💾 Enregistrer
         </button>
 
@@ -99,6 +110,8 @@
     <p>© 2026 BotHost</p>
 
 </footer>
+
+<script src="script.js"></script>
 
 </body>
 
