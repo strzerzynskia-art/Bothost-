@@ -146,6 +146,25 @@ button:hover {
     background: #1d4ed8;
 }
 
+/* Bouton lien */
+
+.main-button {
+    display: block;
+    width: 100%;
+    margin: 12px 0;
+    padding: 15px;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-size: 17px;
+    text-align: center;
+}
+
+.main-button:hover {
+    background: #1d4ed8;
+}
+
 /* Actions rapides */
 
 .quick-actions {
@@ -198,5 +217,9 @@ footer {
     nav a {
         display: block;
         text-align: left;
+    }
+
+    .hero h1 {
+        font-size: 28px;
     }
     }
