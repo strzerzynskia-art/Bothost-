@@ -14,7 +14,9 @@
 
 <header class="navbar">
 
-    <div class="logo">🤖 BotHost</div>
+    <div class="logo">
+        🤖 BotHost
+    </div>
 
     <nav>
         <a href="index.html">🏠 Accueil</a>
@@ -43,22 +45,47 @@
         <h2>🤖 Informations du bot</h2>
 
         <div class="form-group">
-            <label>Nom du bot</label>
-            <input type="text" placeholder="Exemple : Lunex">
+
+            <label for="bot-name">
+                Nom du bot
+            </label>
+
+            <input
+                type="text"
+                id="bot-name"
+                placeholder="Exemple : Lunex"
+            >
+
         </div>
 
         <div class="form-group">
-            <label>Fichier principal</label>
-            <input type="text" placeholder="Exemple : Bot.py">
+
+            <label for="bot-file">
+                Fichier principal
+            </label>
+
+            <input
+                type="text"
+                id="bot-file"
+                placeholder="Exemple : Bot.py"
+            >
+
         </div>
 
         <div class="form-group">
-            <label>Version Python</label>
-            <select>
+
+            <label for="python-version">
+                Version Python
+            </label>
+
+            <select id="python-version">
+
                 <option>Python 3.11</option>
                 <option>Python 3.12</option>
                 <option>Python 3.13</option>
+
             </select>
+
         </div>
 
         <button>
@@ -70,9 +97,11 @@
 </main>
 
 <footer>
+
     <p>© 2026 BotHost</p>
+
 </footer>
 
 </body>
 
-      </html>
+        </html>
