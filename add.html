@@ -23,10 +23,10 @@
         <a href="bot.html">🤖 Mon bot</a>
         <a href="ajouter.html">➕ Ajouter mon bot</a>
         <a href="console.html">🖥️ Console</a>
-        <a href="paramétrage.html">⚙️ Paramètres</a>
     </nav>
 
 </header>
+
 
 <main>
 
@@ -40,9 +40,11 @@
 
     </section>
 
+
     <section class="bot-card">
 
         <h2>🤖 Informations du bot</h2>
+
 
         <div class="form-group">
 
@@ -58,6 +60,7 @@
 
         </div>
 
+
         <div class="form-group">
 
             <label for="bot-file">
@@ -68,9 +71,11 @@
                 type="text"
                 id="bot-file"
                 placeholder="Exemple : Bot.py"
+                value="Bot.py"
             >
 
         </div>
+
 
         <div class="form-group">
 
@@ -80,30 +85,63 @@
 
             <select id="python-version">
 
-                <option>Python 3.11</option>
-                <option>Python 3.12</option>
-                <option>Python 3.13</option>
+                <option value="3.11">
+                    Python 3.11
+                </option>
+
+                <option value="3.12">
+                    Python 3.12
+                </option>
+
+                <option value="3.13">
+                    Python 3.13
+                </option>
 
             </select>
 
         </div>
 
-        <button data-action="add-bot">
+
+        <div class="form-group">
+
+            <label for="bot-id">
+                ID de l'application Discord
+            </label>
+
+            <input
+                type="text"
+                id="bot-id"
+                placeholder="Exemple : 123456789012345678"
+            >
+
+        </div>
+
+
+        <button
+            type="button"
+            data-action="add-bot"
+            class="main-button"
+        >
             ➕ Ajouter le bot
         </button>
+
 
     </section>
 
 </main>
 
+
 <footer>
 
-    <p>© 2026 BotHost</p>
+    <p>
+        © 2026 BotHost — Ton hébergeur personnel
+    </p>
 
 </footer>
+
 
 <script src="script.js"></script>
 
 </body>
 
-                </html>
+            </html>
