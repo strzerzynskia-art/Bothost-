@@ -34,7 +34,7 @@ nav {
 nav a {
     color: #cbd5e1;
     text-decoration: none;
-    padding: 9px 12px;
+    padding: 10px 12px;
     border-radius: 8px;
     transition: 0.2s;
 }
@@ -45,7 +45,7 @@ nav a:hover {
 }
 
 /* =========================
-   CONTENU PRINCIPAL
+   CONTENU
 ========================= */
 
 main {
@@ -70,7 +70,7 @@ main {
 }
 
 /* =========================
-   CARTE DU BOT
+   CARTE BOT
 ========================= */
 
 .bot-card {
@@ -110,7 +110,7 @@ main {
 }
 
 /* =========================
-   INFORMATIONS DU BOT
+   INFORMATIONS
 ========================= */
 
 .bot-info {
@@ -146,7 +146,8 @@ main {
     gap: 12px;
 }
 
-button {
+button,
+.button {
     flex: 1;
     padding: 14px;
     border: none;
@@ -155,37 +156,19 @@ button {
     color: white;
     font-size: 16px;
     cursor: pointer;
-    transition: 0.2s;
-}
-
-button:hover {
-    background: #1d4ed8;
-}
-
-button:active {
-    transform: scale(0.98);
-}
-
-/* =========================
-   BOUTON LIEN
-========================= */
-
-.main-button {
-    display: block;
-    width: 100%;
-    margin: 12px 0;
-    padding: 15px;
-    border-radius: 10px;
-    background: #2563eb;
-    color: white;
     text-decoration: none;
-    font-size: 17px;
     text-align: center;
     transition: 0.2s;
 }
 
-.main-button:hover {
+button:hover,
+.button:hover {
     background: #1d4ed8;
+}
+
+button:active,
+.button:active {
+    transform: scale(0.98);
 }
 
 /* =========================
@@ -204,10 +187,22 @@ button:active {
     margin-top: 0;
 }
 
-.quick-actions button {
+.main-button {
     display: block;
     width: 100%;
     margin-top: 12px;
+    padding: 15px;
+    border-radius: 10px;
+    background: #2563eb;
+    color: white;
+    text-decoration: none;
+    font-size: 17px;
+    text-align: center;
+    transition: 0.2s;
+}
+
+.main-button:hover {
+    background: #1d4ed8;
 }
 
 /* =========================
@@ -299,7 +294,7 @@ button:active {
 }
 
 /* =========================
-   PIED DE PAGE
+   FOOTER
 ========================= */
 
 footer {
@@ -309,7 +304,7 @@ footer {
 }
 
 /* =========================
-   VERSION TÉLÉPHONE
+   TÉLÉPHONE
 ========================= */
 
 @media (max-width: 600px) {
@@ -374,4 +369,4 @@ footer {
     .setting {
         align-items: flex-start;
     }
-    }
+}
