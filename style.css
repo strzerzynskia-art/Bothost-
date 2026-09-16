@@ -9,7 +9,9 @@ body {
     color: white;
 }
 
-/* Navigation */
+/* =========================
+   NAVIGATION
+========================= */
 
 .navbar {
     padding: 18px 25px;
@@ -34,6 +36,7 @@ nav a {
     text-decoration: none;
     padding: 9px 12px;
     border-radius: 8px;
+    transition: 0.2s;
 }
 
 nav a:hover {
@@ -41,7 +44,9 @@ nav a:hover {
     color: white;
 }
 
-/* Contenu */
+/* =========================
+   CONTENU PRINCIPAL
+========================= */
 
 main {
     max-width: 900px;
@@ -64,7 +69,9 @@ main {
     font-size: 17px;
 }
 
-/* Carte du bot */
+/* =========================
+   CARTE DU BOT
+========================= */
 
 .bot-card {
     background: #1e293b;
@@ -90,6 +97,10 @@ main {
     color: #94a3b8;
 }
 
+/* =========================
+   STATUT
+========================= */
+
 .status {
     background: #14532d;
     color: #86efac;
@@ -98,7 +109,9 @@ main {
     font-size: 14px;
 }
 
-/* Informations */
+/* =========================
+   INFORMATIONS DU BOT
+========================= */
 
 .bot-info {
     display: grid;
@@ -124,7 +137,9 @@ main {
     font-size: 18px;
 }
 
-/* Boutons */
+/* =========================
+   BOUTONS
+========================= */
 
 .buttons {
     display: flex;
@@ -140,13 +155,20 @@ button {
     color: white;
     font-size: 16px;
     cursor: pointer;
+    transition: 0.2s;
 }
 
 button:hover {
     background: #1d4ed8;
 }
 
-/* Bouton lien */
+button:active {
+    transform: scale(0.98);
+}
+
+/* =========================
+   BOUTON LIEN
+========================= */
 
 .main-button {
     display: block;
@@ -159,13 +181,16 @@ button:hover {
     text-decoration: none;
     font-size: 17px;
     text-align: center;
+    transition: 0.2s;
 }
 
 .main-button:hover {
     background: #1d4ed8;
 }
 
-/* Actions rapides */
+/* =========================
+   ACTIONS RAPIDES
+========================= */
 
 .quick-actions {
     background: #1e293b;
@@ -185,7 +210,97 @@ button:hover {
     margin-top: 12px;
 }
 
-/* Pied de page */
+/* =========================
+   FORMULAIRE
+========================= */
+
+.form-group {
+    margin-bottom: 18px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #cbd5e1;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 13px;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: #0f172a;
+    color: white;
+    font-size: 16px;
+    outline: none;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #2563eb;
+}
+
+/* =========================
+   CONSOLE
+========================= */
+
+.console-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    padding: 25px;
+}
+
+.console-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.console {
+    background: #020617;
+    border-radius: 12px;
+    padding: 18px;
+    min-height: 280px;
+    font-family: monospace;
+    overflow-x: auto;
+    margin-bottom: 15px;
+}
+
+.console p {
+    margin: 8px 0;
+    color: #cbd5e1;
+}
+
+/* =========================
+   PARAMÈTRES
+========================= */
+
+.setting {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+    padding: 18px 0;
+    border-bottom: 1px solid #334155;
+}
+
+.setting p {
+    color: #94a3b8;
+    margin: 7px 0 0;
+}
+
+.setting input {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+}
+
+/* =========================
+   PIED DE PAGE
+========================= */
 
 footer {
     text-align: center;
@@ -193,9 +308,44 @@ footer {
     color: #64748b;
 }
 
-/* Téléphone */
+/* =========================
+   VERSION TÉLÉPHONE
+========================= */
 
 @media (max-width: 600px) {
+
+    .navbar {
+        padding: 16px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    nav {
+        flex-direction: column;
+    }
+
+    nav a {
+        display: block;
+        text-align: left;
+    }
+
+    main {
+        padding: 20px 15px;
+    }
+
+    .hero {
+        padding: 25px 10px;
+    }
+
+    .hero h1 {
+        font-size: 28px;
+    }
+
+    .hero p {
+        font-size: 15px;
+    }
 
     .bot-header {
         flex-direction: column;
@@ -210,16 +360,18 @@ footer {
         flex-direction: column;
     }
 
-    nav {
-        flex-direction: column;
+    .bot-card,
+    .quick-actions,
+    .console-card {
+        padding: 20px;
     }
 
-    nav a {
-        display: block;
-        text-align: left;
+    .console {
+        min-height: 240px;
+        font-size: 13px;
     }
 
-    .hero h1 {
-        font-size: 28px;
+    .setting {
+        align-items: flex-start;
     }
     }
