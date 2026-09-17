@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Ajouter mon bot - BotHost</title>
+    <title>Mon bot - BotHost</title>
 
     <link rel="stylesheet" href="style.css">
 </head>
@@ -31,94 +31,63 @@
 
     <section class="hero">
 
-        <h1>➕ Ajouter mon bot</h1>
+        <h1>🤖 Mon bot</h1>
 
         <p>
-            Configure ton bot Discord sur BotHost.
+            Voici les informations de ton bot Discord.
         </p>
 
     </section>
 
     <section class="bot-card">
 
-        <h2>🤖 Informations du bot</h2>
+        <div class="bot-header">
 
-        <div class="form-group">
+            <div>
+                <h2>🤖 Mon bot Discord</h2>
+                <p>BotHost</p>
+            </div>
 
-            <label for="bot-name">
-                Nom du bot
-            </label>
-
-            <input
-                type="text"
-                id="bot-name"
-                placeholder="Exemple : Lunex"
-            >
+            <span class="status">
+                🟢 En ligne
+            </span>
 
         </div>
 
-        <div class="form-group">
+        <div class="bot-info">
 
-            <label for="bot-file">
-                Fichier principal
-            </label>
+            <div>
+                <span>État</span>
+                <strong>En ligne</strong>
+            </div>
 
-            <input
-                type="text"
-                id="bot-file"
-                placeholder="Exemple : Bot.py"
-                value="Bot.py"
-            >
+            <div>
+                <span>Uptime</span>
+                <strong>Actif</strong>
+            </div>
 
-        </div>
-
-        <div class="form-group">
-
-            <label for="python-version">
-                Version Python
-            </label>
-
-            <select id="python-version">
-
-                <option value="3.11">
-                    Python 3.11
-                </option>
-
-                <option value="3.12">
-                    Python 3.12
-                </option>
-
-                <option value="3.13">
-                    Python 3.13
-                </option>
-
-            </select>
+            <div>
+                <span>Hébergement</span>
+                <strong>BotHost</strong>
+            </div>
 
         </div>
 
-        <div class="form-group">
+        <div class="buttons">
 
-            <label for="bot-id">
-                ID de l'application Discord
-            </label>
+            <button data-action="start">
+                ▶️ Démarrer
+            </button>
 
-            <input
-                type="text"
-                id="bot-id"
-                placeholder="Exemple : 123456789012345678"
-            >
+            <button data-action="restart">
+                🔄 Redémarrer
+            </button>
+
+            <button data-action="stop">
+                🛑 Arrêter
+            </button>
 
         </div>
-
-        <button
-            type="button"
-            id="add-bot-button"
-            class="main-button"
-        >
-            ➕ Ajouter le bot
-        </button>
-
-        <p id="add-message"></p>
 
     </section>
 
@@ -126,71 +95,14 @@
 
 <footer>
 
-    <p>© 2026 BotHost — Ton hébergeur personnel</p>
+    <p>
+        © 2026 BotHost
+    </p>
 
 </footer>
 
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const button = document.getElementById("add-bot-button");
-    const message = document.getElementById("add-message");
-
-    button.addEventListener("click", function () {
-
-        const botName = document.getElementById("bot-name").value.trim();
-        const botFile = document.getElementById("bot-file").value.trim();
-        const pythonVersion = document.getElementById("python-version").value;
-        const botId = document.getElementById("bot-id").value.trim();
-
-        if (!botName) {
-
-            message.textContent = "❌ Entre le nom de ton bot.";
-            return;
-
-        }
-
-        if (!botFile) {
-
-            message.textContent = "❌ Entre le nom du fichier principal.";
-            return;
-
-        }
-
-        if (!botId) {
-
-            message.textContent = "❌ Entre l'ID de ton application Discord.";
-            return;
-
-        }
-
-        const bot = {
-
-            name: botName,
-            file: botFile,
-            python: pythonVersion,
-            id: botId,
-            status: "Hors ligne"
-
-        };
-
-        localStorage.setItem(
-            "bothost_bot",
-            JSON.stringify(bot)
-        );
-
-        message.textContent =
-            "✅ Ton bot a été ajouté à BotHost !";
-
-        button.textContent = "✅ Bot ajouté";
-
-    });
-
-});
-
-</script>
+<script src="script.js"></script>
 
 </body>
 
-            </html>
+</html>
