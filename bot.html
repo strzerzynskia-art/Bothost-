@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="fr">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -20,86 +19,125 @@
 
     <nav>
         <a href="index.html">🏠 Accueil</a>
-        <a href="bot.html">🤖 Mon bot</a>
+        <a href="bot.html" class="active">🤖 Mon bot</a>
         <a href="ajouter.html">➕ Ajouter mon bot</a>
         <a href="console.html">🖥️ Console</a>
     </nav>
 
 </header>
 
-<main>
 
-    <section class="hero">
+<main class="container">
+
+    <section class="page-header">
 
         <h1>🤖 Mon bot</h1>
 
         <p>
-            Voici les informations de ton bot Discord.
+            Gestion de ton bot Discord depuis BotHost.
         </p>
 
     </section>
+
+
+    <!-- BOT -->
 
     <section class="bot-card">
 
         <div class="bot-header">
 
             <div>
-                <h2 id="bot-name-display">🤖 Aucun bot ajouté</h2>
-                <p>BotHost</p>
-            </div>
+                <h2 id="bot-name-display">Lunex</h2>
 
-            <span class="status" id="bot-status-display">
-                ⚪ Aucun bot configuré
-            </span>
+                <span id="bot-status" class="status offline">
+                    Hors ligne
+                </span>
+            </div>
 
         </div>
 
+
+        <!-- INFORMATIONS -->
+
         <div class="bot-info">
 
-            <div>
-                <span>État</span>
-                <strong id="bot-state-display">Non configuré</strong>
+            <div class="info-box">
+                <span>📄 Fichier principal</span>
+                <strong id="bot-file">Bot.py</strong>
             </div>
 
-            <div>
-                <span>Fichier principal</span>
-                <strong id="bot-file-display">—</strong>
+
+            <div class="info-box">
+                <span>🐍 Python</span>
+                <strong id="bot-python">Python 3.11</strong>
             </div>
 
-            <div>
-                <span>Version Python</span>
-                <strong id="bot-python-display">—</strong>
+
+            <div class="info-box">
+                <span>🆔 ID de l'application</span>
+                <strong id="bot-id">1537780797019258890</strong>
             </div>
 
-            <div>
-                <span>ID de l'application</span>
-                <strong id="bot-id-display">—</strong>
+
+            <div class="info-box">
+                <span>⏱️ Uptime</span>
+                <strong id="bot-uptime">00:00:00</strong>
             </div>
 
-            <div>
-                <span>Uptime</span>
-                <strong>Actif</strong>
+
+            <div class="info-box">
+                <span>💾 Mémoire</span>
+                <strong id="bot-memory">0 MB</strong>
             </div>
 
-            <div>
-                <span>Hébergement</span>
+
+            <div class="info-box">
+                <span>🌐 Hébergement</span>
                 <strong>BotHost</strong>
             </div>
 
         </div>
 
-        <div class="buttons">
 
-            <button data-action="start">
+        <!-- CONTROLES -->
+
+        <div class="bot-controls">
+
+            <button
+                class="main-button start-button"
+                data-action="start">
                 ▶️ Démarrer
             </button>
 
-            <button data-action="restart">
+
+            <button
+                class="main-button restart-button"
+                data-action="restart">
                 🔄 Redémarrer
             </button>
 
-            <button data-action="stop">
-                🛑 Arrêter
+
+            <button
+                class="main-button stop-button"
+                data-action="stop">
+                ⏹️ Arrêter
+            </button>
+
+        </div>
+
+
+        <!-- ACTUALISATION -->
+
+        <div class="bot-refresh">
+
+            <span id="last-update">
+                Dernière actualisation : jamais
+            </span>
+
+            <button
+                class="secondary-button"
+                id="refresh-bot">
+                🔄 Actualiser
             </button>
 
         </div>
@@ -108,16 +146,8 @@
 
 </main>
 
-<footer>
-
-    <p>
-        © 2026 BotHost
-    </p>
-
-</footer>
 
 <script src="script.js"></script>
 
 </body>
-
-                    </html>
+    </html>
