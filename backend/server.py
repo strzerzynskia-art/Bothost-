@@ -2,6 +2,8 @@ import os
 import sys
 import time
 import subprocess
+import threading
+from collections import deque
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -32,7 +34,7 @@ app.add_middleware(
 
 
 # =========================
-# BOT LUNEX
+# BOT
 # =========================
 
 bot = {
@@ -42,27 +44,86 @@ bot = {
     "application_id": "1537780797019258890",
     "status": "Hors ligne",
     "uptime": "00:00:00",
-    "memory": "0 MB"
+    "memory": "0 MB",
+    "error": None
 }
 
 
 # =========================
-# PROCESSUS DU BOT
+# PROCESSUS
 # =========================
 
 bot_process = None
 bot_start_time = None
 
+logs = deque(maxlen=500)
+
+log_thread = None
+
 
 # =========================
-# OUTILS
+# OUTILS LOGS
+# =========================
+
+def add_log(message):
+
+    global logs
+
+    if not message:
+        return
+
+    token = os.getenv("DISCORD_TOKEN")
+
+    if token:
+        message = message.replace(token, "[TOKEN MASQUÉ]")
+
+    heure = time.strftime("%H:%M:%S")
+
+    logs.append(f"[{heure}] {message}")
+
+
+def read_bot_logs():
+
+    global bot_process
+
+    if bot_process is None:
+        return
+
+    try:
+
+        for line in iter(bot_process.stdout.readline, ""):
+
+            if not line:
+                break
+
+            line = line.rstrip()
+
+            add_log(line)
+
+            lower = line.lower()
+
+            if (
+                "traceback" in lower
+                or "error" in lower
+                or "exception" in lower
+                or "failed" in lower
+                or "invalid token" in lower
+            ):
+
+                bot["error"] = line
+
+        bot_process.stdout.close()
+
+    except Exception as error:
+
+        add_log(f"Erreur de lecture des logs : {error}")
+
+
+# =========================
+# FICHIER BOT
 # =========================
 
 def get_bot_file():
-    """
-    Retourne le chemin exact vers Bot.py.
-    Render utilise 'backend' comme dossier racine.
-    """
 
     return os.path.join(
         os.path.dirname(__file__),
@@ -72,7 +133,12 @@ def get_bot_file():
     )
 
 
+# =========================
+# PROCESSUS ACTIF
+# =========================
+
 def is_bot_running():
+
     global bot_process
 
     if bot_process is None:
@@ -84,7 +150,12 @@ def is_bot_running():
     return False
 
 
+# =========================
+# UPTIME
+# =========================
+
 def get_uptime():
+
     global bot_start_time
 
     if bot_start_time is None:
@@ -99,19 +170,42 @@ def get_uptime():
     return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
 
 
+# =========================
+# STATUT
+# =========================
+
 def update_bot_status():
 
+    global bot_process
+
     if is_bot_running():
+
         bot["status"] = "En ligne"
         bot["uptime"] = get_uptime()
 
     else:
-        bot["status"] = "Hors ligne"
+
+        if bot_process is not None:
+
+            code = bot_process.poll()
+
+            if code is not None and code != 0:
+
+                bot["status"] = "Erreur"
+
+            else:
+
+                bot["status"] = "Hors ligne"
+
+        else:
+
+            bot["status"] = "Hors ligne"
+
         bot["uptime"] = "00:00:00"
 
 
 # =========================
-# ACCUEIL API
+# ACCUEIL
 # =========================
 
 @app.get("/")
@@ -125,7 +219,7 @@ def home():
 
 
 # =========================
-# DIAGNOSTIC DES FICHIERS
+# DEBUG FICHIERS
 # =========================
 
 @app.get("/api/debug/files")
@@ -149,6 +243,7 @@ def debug_files():
     )
 
     return {
+
         "base": base,
 
         "contenu_backend": (
@@ -180,7 +275,7 @@ def debug_files():
 
 
 # =========================
-# INFORMATIONS DU BOT
+# INFORMATIONS BOT
 # =========================
 
 @app.get("/api/bot")
@@ -192,7 +287,40 @@ def get_bot():
 
 
 # =========================
-# DÉMARRER LE BOT
+# LOGS
+# =========================
+
+@app.get("/api/logs")
+def get_logs():
+
+    update_bot_status()
+
+    return {
+        "logs": list(logs),
+        "error": bot["error"],
+        "status": bot["status"]
+    }
+
+
+# =========================
+# EFFACER LES LOGS
+# =========================
+
+@app.post("/api/logs/clear")
+def clear_logs():
+
+    logs.clear()
+
+    bot["error"] = None
+
+    return {
+        "success": True,
+        "message": "Console effacée."
+    }
+
+
+# =========================
+# DÉMARRER
 # =========================
 
 @app.post("/api/bot/start")
@@ -200,6 +328,7 @@ def start_bot():
 
     global bot_process
     global bot_start_time
+    global log_thread
 
     update_bot_status()
 
@@ -212,15 +341,15 @@ def start_bot():
         }
 
 
-    # =========================
-    # TOKEN
-    # =========================
-
     token = os.getenv("DISCORD_TOKEN")
 
     if not token:
 
-        bot["status"] = "Hors ligne"
+        bot["status"] = "Erreur"
+
+        bot["error"] = "DISCORD_TOKEN n'est pas configuré sur Render."
+
+        add_log("ERREUR : DISCORD_TOKEN n'est pas configuré sur Render.")
 
         return {
             "success": False,
@@ -229,54 +358,79 @@ def start_bot():
         }
 
 
-    # =========================
-    # FICHIER BOT
-    # =========================
-
     bot_file = get_bot_file()
-
 
     if not os.path.exists(bot_file):
 
+        bot["status"] = "Erreur"
+
+        bot["error"] = f"Bot.py introuvable : {bot_file}"
+
+        add_log(f"ERREUR : Bot.py introuvable : {bot_file}")
+
         return {
             "success": False,
-            "message": f"Fichier Bot.py introuvable. Chemin recherché : {bot_file}",
+            "message": "Bot.py est introuvable.",
             "bot": bot
         }
 
 
-    # =========================
-    # ENVIRONNEMENT
-    # =========================
-
     try:
+
+        logs.clear()
+
+        bot["error"] = None
+
+        add_log("Démarrage de Lunex...")
 
         environment = os.environ.copy()
 
         environment["DISCORD_TOKEN"] = token
 
 
-        # =========================
-        # DÉMARRAGE
-        # =========================
-
         bot_process = subprocess.Popen(
-            [sys.executable, bot_file],
+
+            [
+                sys.executable,
+                "-u",
+                bot_file
+            ],
+
             cwd=os.path.dirname(bot_file),
-            env=environment
+
+            env=environment,
+
+            stdout=subprocess.PIPE,
+
+            stderr=subprocess.STDOUT,
+
+            text=True,
+
+            bufsize=1
         )
 
 
         bot_start_time = time.time()
 
+        bot["status"] = "Démarrage"
 
-        bot["status"] = "En ligne"
         bot["uptime"] = "00:00:00"
 
 
+        log_thread = threading.Thread(
+            target=read_bot_logs,
+            daemon=True
+        )
+
+        log_thread.start()
+
+
         return {
+
             "success": True,
-            "message": "Lunex démarré.",
+
+            "message": "Lunex est en cours de démarrage.",
+
             "bot": bot
         }
 
@@ -286,17 +440,24 @@ def start_bot():
         bot_process = None
         bot_start_time = None
 
-        bot["status"] = "Hors ligne"
+        bot["status"] = "Erreur"
+
+        bot["error"] = str(error)
+
+        add_log(f"ERREUR : {error}")
 
         return {
+
             "success": False,
+
             "message": f"Impossible de démarrer Lunex : {error}",
+
             "bot": bot
         }
 
 
 # =========================
-# REDÉMARRER LE BOT
+# REDÉMARRER
 # =========================
 
 @app.post("/api/bot/restart")
@@ -310,6 +471,7 @@ def restart_bot():
         try:
 
             bot_process.terminate()
+
             bot_process.wait(timeout=10)
 
         except Exception:
@@ -322,14 +484,16 @@ def restart_bot():
 
 
     bot_process = None
+
     bot_start_time = None
 
+    add_log("Redémarrage de Lunex...")
 
     return start_bot()
 
 
 # =========================
-# ARRÊTER LE BOT
+# ARRÊTER
 # =========================
 
 @app.post("/api/bot/stop")
@@ -341,11 +505,15 @@ def stop_bot():
     if not is_bot_running():
 
         bot["status"] = "Hors ligne"
+
         bot["uptime"] = "00:00:00"
 
         return {
+
             "success": False,
+
             "message": "Lunex est déjà hors ligne.",
+
             "bot": bot
         }
 
@@ -353,6 +521,7 @@ def stop_bot():
     try:
 
         bot_process.terminate()
+
         bot_process.wait(timeout=10)
 
     except Exception:
@@ -365,15 +534,22 @@ def stop_bot():
 
 
     bot_process = None
+
     bot_start_time = None
 
     bot["status"] = "Hors ligne"
+
     bot["uptime"] = "00:00:00"
+
+    add_log("Lunex arrêté.")
 
 
     return {
+
         "success": True,
+
         "message": "Lunex arrêté.",
+
         "bot": bot
     }
 
@@ -388,6 +564,8 @@ def api_status():
     update_bot_status()
 
     return {
+
         "api": "online",
+
         "bot": bot["status"]
-        }
+}
