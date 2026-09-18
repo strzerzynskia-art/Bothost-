@@ -1,395 +1,158 @@
-document.addEventListener("DOMContentLoaded", function () {
+const API_URL = "https://bothost-pz1h.onrender.com";
 
-    console.log("🤖 BotHost est chargé !");
+// =========================
+// BOT LOCAL
+// =========================
+
+function getBot() {
+    return JSON.parse(localStorage.getItem("bothost_bot")) || {
+        name: "Lunex",
+        file: "Bot.py",
+        python: "3.11",
+        applicationId: "1537780797019258890"
+    };
+}
+
+function saveBot(bot) {
+    localStorage.setItem("bothost_bot", JSON.stringify(bot));
+}
 
 
-    /*
-     * =========================
-     * AFFICHER LE BOT ENREGISTRÉ
-     * =========================
-     */
+// =========================
+// API
+// =========================
 
-    const botNameDisplay =
-        document.getElementById("bot-name-display");
+async function getBotStatus() {
+    try {
+        const response = await fetch(`${API_URL}/api/bot`);
 
-    if (botNameDisplay) {
-
-        const savedBot =
-            localStorage.getItem("bothost_bot");
-
-        let bot = null;
-
-        if (savedBot) {
-
-            try {
-
-                bot = JSON.parse(savedBot);
-
-            } catch (error) {
-
-                console.error(
-                    "Impossible de lire les données du bot :",
-                    error
-                );
-
-            }
-
+        if (!response.ok) {
+            throw new Error("Erreur API");
         }
 
-        const statusDisplay =
-            document.getElementById("bot-status-display");
-
-        const stateDisplay =
-            document.getElementById("bot-state-display");
-
-        const fileDisplay =
-            document.getElementById("bot-file-display");
-
-        const pythonDisplay =
-            document.getElementById("bot-python-display");
-
-        const idDisplay =
-            document.getElementById("bot-id-display");
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
 
 
-        if (bot) {
+async function controlBot(action) {
+    try {
+        const response = await fetch(`${API_URL}/api/bot/${action}`, {
+            method: "POST"
+        });
 
-            const botStatus =
-                bot.status || "Hors ligne";
-
-            const isOnline =
-                botStatus.toLowerCase() === "en ligne";
-
-
-            botNameDisplay.textContent =
-                "🤖 " + (bot.name || "Mon bot Discord");
-
-            statusDisplay.textContent =
-                (isOnline ? "🟢 " : "🔴 ") + botStatus;
-
-            stateDisplay.textContent =
-                botStatus;
-
-            fileDisplay.textContent =
-                bot.file || "—";
-
-            pythonDisplay.textContent =
-                bot.python
-                    ? "Python " + bot.python
-                    : "—";
-
-            idDisplay.textContent =
-                bot.id || "—";
-
-
-            statusDisplay.classList.toggle(
-                "offline",
-                !isOnline
-            );
-
-
-        } else {
-
-            botNameDisplay.textContent =
-                "🤖 Aucun bot ajouté";
-
-            statusDisplay.textContent =
-                "⚪ Aucun bot configuré";
-
-            stateDisplay.textContent =
-                "Non configuré";
-
-            fileDisplay.textContent =
-                "—";
-
-            pythonDisplay.textContent =
-                "—";
-
-            idDisplay.textContent =
-                "—";
-
-
-            statusDisplay.classList.add("offline");
-
+        if (!response.ok) {
+            throw new Error("Erreur API");
         }
 
+        return await response.json();
+    } catch (error) {
+        console.error(error);
+        alert("Impossible de contacter l'API BotHost.");
+        return null;
+    }
+}
+
+
+// =========================
+// AFFICHAGE DU BOT
+// =========================
+
+async function updateBotPage() {
+    const bot = await getBotStatus();
+
+    if (!bot) {
+        return;
     }
 
+    const name = document.querySelector("#bot-name-display");
+    const status = document.querySelector("#bot-status");
+    const file = document.querySelector("#bot-file");
+    const python = document.querySelector("#bot-python");
+    const applicationId = document.querySelector("#bot-id");
 
-    /*
-     * =========================
-     * DÉMARRER LE BOT
-     * =========================
-     */
+    if (name) name.textContent = bot.name;
+    if (status) status.textContent = bot.status;
+    if (file) file.textContent = bot.file;
+    if (python) python.textContent = `Python ${bot.python}`;
+    if (applicationId) applicationId.textContent = bot.application_id;
+}
 
-    const startButtons =
-        document.querySelectorAll(
-            '[data-action="start"]'
-        );
 
-    startButtons.forEach(function (button) {
+// =========================
+// BOUTONS START / RESTART / STOP
+// =========================
 
-        button.addEventListener("click", function () {
+document.addEventListener("click", async (event) => {
 
-            console.log(
-                "▶️ Demande de démarrage du bot..."
-            );
+    const button = event.target.closest("[data-action]");
 
-            alert(
-                "▶️ Démarrage demandé.\n\n" +
-                "Le contrôle réel du bot sera connecté au backend plus tard."
-            );
+    if (!button) {
+        return;
+    }
 
-        });
+    const action = button.dataset.action;
 
+    if (!["start", "restart", "stop"].includes(action)) {
+        return;
+    }
+
+    button.disabled = true;
+
+    const result = await controlBot(action);
+
+    if (result) {
+        alert(result.message);
+        await updateBotPage();
+    }
+
+    button.disabled = false;
+});
+
+
+// =========================
+// AJOUTER UN BOT
+// =========================
+
+const addBotButton = document.querySelector('[data-action="add-bot"]');
+
+if (addBotButton) {
+
+    addBotButton.addEventListener("click", () => {
+
+        const name = document.querySelector("#bot-name")?.value.trim();
+        const file = document.querySelector("#bot-file")?.value.trim();
+        const python = document.querySelector("#python-version")?.value;
+        const applicationId = document.querySelector("#bot-id")?.value.trim();
+
+        if (!name || !file || !python || !applicationId) {
+            alert("Veuillez remplir tous les champs.");
+            return;
+        }
+
+        const bot = {
+            name: name,
+            file: file,
+            python: python,
+            applicationId: applicationId
+        };
+
+        saveBot(bot);
+
+        alert("Bot ajouté avec succès !");
+
+        window.location.href = "bot.html";
     });
+}
 
 
-    /*
-     * =========================
-     * REDÉMARRER LE BOT
-     * =========================
-     */
+// =========================
+// CHARGEMENT
+// =========================
 
-    const restartButtons =
-        document.querySelectorAll(
-            '[data-action="restart"]'
-        );
-
-    restartButtons.forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            console.log(
-                "🔄 Demande de redémarrage du bot..."
-            );
-
-            alert(
-                "🔄 Redémarrage demandé.\n\n" +
-                "Le contrôle réel du bot sera connecté au backend plus tard."
-            );
-
-        });
-
-    });
-
-
-    /*
-     * =========================
-     * ARRÊTER LE BOT
-     * =========================
-     */
-
-    const stopButtons =
-        document.querySelectorAll(
-            '[data-action="stop"]'
-        );
-
-    stopButtons.forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            console.log(
-                "🛑 Demande d'arrêt du bot..."
-            );
-
-            alert(
-                "🛑 Arrêt demandé.\n\n" +
-                "Le contrôle réel du bot sera connecté au backend plus tard."
-            );
-
-        });
-
-    });
-
-
-    /*
-     * =========================
-     * AJOUTER UN BOT
-     * =========================
-     */
-
-    const addBotButton =
-        document.querySelector(
-            '[data-action="add-bot"]'
-        );
-
-
-    if (addBotButton) {
-
-        addBotButton.addEventListener(
-            "click",
-            function () {
-
-                const botName =
-                    document
-                        .getElementById("bot-name")
-                        ?.value
-                        .trim();
-
-
-                const botFile =
-                    document
-                        .getElementById("bot-file")
-                        ?.value
-                        .trim();
-
-
-                const pythonVersion =
-                    document
-                        .getElementById("python-version")
-                        ?.value;
-
-
-                const botId =
-                    document
-                        .getElementById("bot-id")
-                        ?.value
-                        .trim();
-
-
-                if (!botName) {
-
-                    alert(
-                        "❌ Entre le nom de ton bot."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!botFile) {
-
-                    alert(
-                        "❌ Entre le nom du fichier principal."
-                    );
-
-                    return;
-
-                }
-
-
-                if (!botId) {
-
-                    alert(
-                        "❌ Entre l'ID de ton application Discord."
-                    );
-
-                    return;
-
-                }
-
-
-                const bot = {
-
-                    name: botName,
-
-                    file: botFile,
-
-                    python: pythonVersion,
-
-                    id: botId,
-
-                    status: "Hors ligne"
-
-                };
-
-
-                localStorage.setItem(
-                    "bothost_bot",
-                    JSON.stringify(bot)
-                );
-
-
-                console.log(
-                    "🤖 Bot ajouté :",
-                    bot
-                );
-
-
-                alert(
-                    "✅ Ton bot a été ajouté à BotHost !"
-                );
-
-
-                addBotButton.textContent =
-                    "✅ Bot ajouté";
-
-            }
-        );
-
-    }
-
-
-    /*
-     * =========================
-     * EFFACER LA CONSOLE
-     * =========================
-     */
-
-    const clearConsoleButton =
-        document.querySelector(
-            '[data-action="clear-console"]'
-        );
-
-
-    const consoleElement =
-        document.querySelector(".console");
-
-
-    if (
-        clearConsoleButton &&
-        consoleElement
-    ) {
-
-        clearConsoleButton.addEventListener(
-            "click",
-            function () {
-
-                consoleElement.innerHTML = "";
-
-                console.log(
-                    "🗑️ Console effacée."
-                );
-
-            }
-        );
-
-    }
-
-
-    /*
-     * =========================
-     * PARAMÈTRES
-     * =========================
-     */
-
-    const saveSettingsButton =
-        document.querySelector(
-            '[data-action="save-settings"]'
-        );
-
-
-    if (saveSettingsButton) {
-
-        saveSettingsButton.addEventListener(
-            "click",
-            function () {
-
-                alert(
-                    "💾 Paramètres enregistrés.\n\n" +
-                    "La sauvegarde réelle sera connectée au backend plus tard."
-                );
-
-
-                console.log(
-                    "⚙️ Paramètres enregistrés."
-                );
-
-            }
-        );
-
-    }
-
+document.addEventListener("DOMContentLoaded", () => {
+    updateBotPage();
 });
