@@ -31,8 +31,9 @@ async function getBotStatus() {
         }
 
         return await response.json();
+
     } catch (error) {
-        console.error(error);
+        console.error("Erreur récupération bot :", error);
         return null;
     }
 }
@@ -49,9 +50,12 @@ async function controlBot(action) {
         }
 
         return await response.json();
+
     } catch (error) {
-        console.error(error);
+        console.error("Erreur contrôle bot :", error);
+
         alert("Impossible de contacter l'API BotHost.");
+
         return null;
     }
 }
@@ -62,6 +66,7 @@ async function controlBot(action) {
 // =========================
 
 async function updateBotPage() {
+
     const bot = await getBotStatus();
 
     if (!bot) {
@@ -73,12 +78,80 @@ async function updateBotPage() {
     const file = document.querySelector("#bot-file");
     const python = document.querySelector("#bot-python");
     const applicationId = document.querySelector("#bot-id");
+    const uptime = document.querySelector("#bot-uptime");
+    const memory = document.querySelector("#bot-memory");
+    const lastUpdate = document.querySelector("#last-update");
 
-    if (name) name.textContent = bot.name;
-    if (status) status.textContent = bot.status;
-    if (file) file.textContent = bot.file;
-    if (python) python.textContent = `Python ${bot.python}`;
-    if (applicationId) applicationId.textContent = bot.application_id;
+
+    // Nom
+
+    if (name) {
+        name.textContent = bot.name;
+    }
+
+
+    // Statut
+
+    if (status) {
+
+        status.textContent = bot.status;
+
+        status.classList.remove("online", "offline");
+
+        if (bot.status === "En ligne") {
+            status.classList.add("online");
+        } else {
+            status.classList.add("offline");
+        }
+    }
+
+
+    // Fichier
+
+    if (file) {
+        file.textContent = bot.file;
+    }
+
+
+    // Python
+
+    if (python) {
+        python.textContent = `Python ${bot.python}`;
+    }
+
+
+    // ID application
+
+    if (applicationId) {
+        applicationId.textContent = bot.application_id;
+    }
+
+
+    // Uptime
+
+    if (uptime) {
+        uptime.textContent = bot.uptime || "00:00:00";
+    }
+
+
+    // Mémoire
+
+    if (memory) {
+        memory.textContent = bot.memory || "0 MB";
+    }
+
+
+    // Dernière actualisation
+
+    if (lastUpdate) {
+
+        const maintenant = new Date();
+
+        const heure = maintenant.toLocaleTimeString("fr-FR");
+
+        lastUpdate.textContent =
+            `Dernière actualisation : ${heure}`;
+    }
 }
 
 
@@ -94,20 +167,75 @@ document.addEventListener("click", async (event) => {
         return;
     }
 
+
     const action = button.dataset.action;
+
 
     if (!["start", "restart", "stop"].includes(action)) {
         return;
     }
 
+
     button.disabled = true;
+
+
+    const ancienTexte = button.textContent;
+
+
+    if (action === "start") {
+        button.textContent = "⏳ Démarrage...";
+    }
+
+    if (action === "restart") {
+        button.textContent = "⏳ Redémarrage...";
+    }
+
+    if (action === "stop") {
+        button.textContent = "⏳ Arrêt...";
+    }
+
 
     const result = await controlBot(action);
 
+
     if (result) {
+
         alert(result.message);
+
         await updateBotPage();
     }
+
+
+    button.textContent = ancienTexte;
+
+    button.disabled = false;
+});
+
+
+// =========================
+// BOUTON ACTUALISER
+// =========================
+
+document.addEventListener("click", async (event) => {
+
+    const button = event.target.closest("#refresh-bot");
+
+    if (!button) {
+        return;
+    }
+
+
+    button.disabled = true;
+
+    const ancienTexte = button.textContent;
+
+    button.textContent = "⏳ Actualisation...";
+
+
+    await updateBotPage();
+
+
+    button.textContent = ancienTexte;
 
     button.disabled = false;
 });
@@ -117,36 +245,56 @@ document.addEventListener("click", async (event) => {
 // AJOUTER UN BOT
 // =========================
 
-const addBotButton = document.querySelector('[data-action="add-bot"]');
+document.addEventListener("click", (event) => {
 
-if (addBotButton) {
+    const button = event.target.closest('[data-action="add-bot"]');
 
-    addBotButton.addEventListener("click", () => {
+    if (!button) {
+        return;
+    }
 
-        const name = document.querySelector("#bot-name")?.value.trim();
-        const file = document.querySelector("#bot-file")?.value.trim();
-        const python = document.querySelector("#python-version")?.value;
-        const applicationId = document.querySelector("#bot-id")?.value.trim();
 
-        if (!name || !file || !python || !applicationId) {
-            alert("Veuillez remplir tous les champs.");
-            return;
-        }
+    const name =
+        document.querySelector("#bot-name")?.value.trim();
 
-        const bot = {
-            name: name,
-            file: file,
-            python: python,
-            applicationId: applicationId
-        };
+    const file =
+        document.querySelector("#bot-file")?.value.trim();
 
-        saveBot(bot);
+    const python =
+        document.querySelector("#python-version")?.value;
 
-        alert("Bot ajouté avec succès !");
+    const applicationId =
+        document.querySelector("#bot-id")?.value.trim();
 
-        window.location.href = "bot.html";
-    });
-}
+
+    if (!name || !file || !python || !applicationId) {
+
+        alert("Veuillez remplir tous les champs.");
+
+        return;
+    }
+
+
+    const bot = {
+
+        name: name,
+
+        file: file,
+
+        python: python,
+
+        applicationId: applicationId
+    };
+
+
+    saveBot(bot);
+
+
+    alert("Bot ajouté avec succès !");
+
+
+    window.location.href = "bot.html";
+});
 
 
 // =========================
@@ -154,5 +302,7 @@ if (addBotButton) {
 // =========================
 
 document.addEventListener("DOMContentLoaded", () => {
+
     updateBotPage();
+
 });
