@@ -2,15 +2,26 @@
 <html lang="fr">
 
 <head>
+
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Console - BotHost</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
+
 </head>
 
+
 <body>
+
 
 <header class="navbar">
 
@@ -18,64 +29,158 @@
         🤖 BotHost
     </div>
 
+
     <nav>
-        <a href="index.html">🏠 Accueil</a>
-        <a href="bot.html">🤖 Mon bot</a>
-        <a href="ajouter.html">➕ Ajouter mon bot</a>
-        <a href="console.html">🖥️ Console</a>
+
+        <a href="index.html">
+            🏠 Accueil
+        </a>
+
+        <a href="bot.html">
+            🤖 Mon bot
+        </a>
+
+        <a href="ajouter.html">
+            ➕ Ajouter mon bot
+        </a>
+
+        <a
+            href="console.html"
+            class="active"
+        >
+            🖥️ Console
+        </a>
+
     </nav>
 
 </header>
 
-<main>
 
-    <section class="hero">
 
-        <h1>🖥️ Console</h1>
+<main class="container">
+
+
+    <section class="page-header">
+
+        <h1>
+            🖥️ Console
+        </h1>
 
         <p>
-            Consulte les logs et l'activité de ton bot.
+            Consulte les logs et les erreurs de ton bot.
         </p>
 
     </section>
 
-    <section class="console-card">
 
-        <div class="console-header">
 
-            <strong>BotHost Console</strong>
+    <section class="bot-card">
 
-            <span class="status">
-                🟢 En ligne
-            </span>
+
+        <div class="bot-header">
+
+            <div>
+
+                <h2>
+                    🤖 Lunex
+                </h2>
+
+                <span
+                    id="console-status"
+                    class="status offline"
+                >
+                    Hors ligne
+                </span>
+
+            </div>
 
         </div>
 
-        <div class="console">
 
-            <p>[INFO] BotHost démarré...</p>
-            <p>[INFO] Connexion à Discord...</p>
-            <p>[INFO] Bot connecté.</p>
-            <p>[INFO] En attente de commandes...</p>
+
+        <div
+            id="error-box"
+            style="display:none; margin-top:20px;"
+        >
+
+            <div class="info-box">
+
+                <span>
+                    🔴 Problème détecté
+                </span>
+
+                <strong id="error-message">
+                    Aucune erreur
+                </strong>
+
+            </div>
 
         </div>
 
-        <button data-action="clear-console">
-            🗑️ Effacer la console
-        </button>
+
+
+        <div
+            id="console-output"
+            style="
+                margin-top:20px;
+                background:#050505;
+                border:1px solid #333;
+                border-radius:12px;
+                padding:16px;
+                min-height:350px;
+                max-height:500px;
+                overflow:auto;
+                font-family:monospace;
+                white-space:pre-wrap;
+                color:#e5e5e5;
+            "
+        >
+            Chargement de la console...
+        </div>
+
+
+
+        <div
+            class="bot-controls"
+            style="margin-top:20px;"
+        >
+
+            <button
+                class="main-button restart-button"
+                id="refresh-console"
+            >
+                🔄 Actualiser
+            </button>
+
+
+            <button
+                class="main-button stop-button"
+                id="clear-console"
+            >
+                🗑️ Effacer
+            </button>
+
+
+            <button
+                class="main-button start-button"
+                id="copy-error"
+            >
+                📋 Copier l'erreur
+            </button>
+
+        </div>
+
 
     </section>
 
+
 </main>
 
-<footer>
 
-    <p>© 2026 BotHost</p>
-
-</footer>
 
 <script src="script.js"></script>
 
+
 </body>
 
-                                       </html>
+    </html>
