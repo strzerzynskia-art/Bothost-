@@ -58,6 +58,20 @@ bot_start_time = None
 # OUTILS
 # =========================
 
+def get_bot_file():
+    """
+    Retourne le chemin exact vers Bot.py.
+    Render utilise 'backend' comme dossier racine.
+    """
+
+    return os.path.join(
+        os.path.dirname(__file__),
+        "bots",
+        "Lunex",
+        "Bot.py"
+    )
+
+
 def is_bot_running():
     global bot_process
 
@@ -90,6 +104,7 @@ def update_bot_status():
     if is_bot_running():
         bot["status"] = "En ligne"
         bot["uptime"] = get_uptime()
+
     else:
         bot["status"] = "Hors ligne"
         bot["uptime"] = "00:00:00"
@@ -106,6 +121,61 @@ def home():
         "name": "BotHost API",
         "status": "online",
         "version": "1.0.0"
+    }
+
+
+# =========================
+# DIAGNOSTIC DES FICHIERS
+# =========================
+
+@app.get("/api/debug/files")
+def debug_files():
+
+    base = os.path.dirname(__file__)
+
+    bots_folder = os.path.join(
+        base,
+        "bots"
+    )
+
+    lunex_folder = os.path.join(
+        bots_folder,
+        "Lunex"
+    )
+
+    bot_file = os.path.join(
+        lunex_folder,
+        "Bot.py"
+    )
+
+    return {
+        "base": base,
+
+        "contenu_backend": (
+            os.listdir(base)
+            if os.path.exists(base)
+            else []
+        ),
+
+        "bots_existe": os.path.exists(bots_folder),
+
+        "contenu_bots": (
+            os.listdir(bots_folder)
+            if os.path.exists(bots_folder)
+            else []
+        ),
+
+        "lunex_existe": os.path.exists(lunex_folder),
+
+        "contenu_lunex": (
+            os.listdir(lunex_folder)
+            if os.path.exists(lunex_folder)
+            else []
+        ),
+
+        "bot_file": bot_file,
+
+        "bot_existe": os.path.exists(bot_file)
     }
 
 
@@ -142,6 +212,10 @@ def start_bot():
         }
 
 
+    # =========================
+    # TOKEN
+    # =========================
+
     token = os.getenv("DISCORD_TOKEN")
 
     if not token:
@@ -155,22 +229,25 @@ def start_bot():
         }
 
 
-    bot_file = os.path.join(
-        os.path.dirname(__file__),
-        "bots",
-        "Lunex",
-        "Bot.py"
-    )
+    # =========================
+    # FICHIER BOT
+    # =========================
+
+    bot_file = get_bot_file()
 
 
     if not os.path.exists(bot_file):
 
         return {
             "success": False,
-            "message": "Le fichier Bot.py est introuvable.",
+            "message": f"Fichier Bot.py introuvable. Chemin recherché : {bot_file}",
             "bot": bot
         }
 
+
+    # =========================
+    # ENVIRONNEMENT
+    # =========================
 
     try:
 
@@ -178,6 +255,10 @@ def start_bot():
 
         environment["DISCORD_TOKEN"] = token
 
+
+        # =========================
+        # DÉMARRAGE
+        # =========================
 
         bot_process = subprocess.Popen(
             [sys.executable, bot_file],
@@ -187,6 +268,7 @@ def start_bot():
 
 
         bot_start_time = time.time()
+
 
         bot["status"] = "En ligne"
         bot["uptime"] = "00:00:00"
@@ -208,7 +290,7 @@ def start_bot():
 
         return {
             "success": False,
-            "message": "Impossible de démarrer Lunex.",
+            "message": f"Impossible de démarrer Lunex : {error}",
             "bot": bot
         }
 
@@ -226,6 +308,7 @@ def restart_bot():
     if is_bot_running():
 
         try:
+
             bot_process.terminate()
             bot_process.wait(timeout=10)
 
@@ -233,6 +316,7 @@ def restart_bot():
 
             try:
                 bot_process.kill()
+
             except Exception:
                 pass
 
@@ -275,6 +359,7 @@ def stop_bot():
 
         try:
             bot_process.kill()
+
         except Exception:
             pass
 
@@ -305,4 +390,4 @@ def api_status():
     return {
         "api": "online",
         "bot": bot["status"]
-}
+        }
