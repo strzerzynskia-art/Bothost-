@@ -54,6 +54,28 @@ main {
     padding: 30px 20px;
 }
 
+.container {
+    max-width: 900px;
+    margin: auto;
+    padding: 30px 20px;
+}
+
+.page-header {
+    margin-bottom: 20px;
+}
+
+.page-header h1 {
+    margin-bottom: 8px;
+}
+
+.page-header p {
+    color: #94a3b8;
+}
+
+/* =========================
+   HERO
+========================= */
+
 .hero {
     padding: 35px 20px;
     text-align: center;
@@ -89,7 +111,7 @@ main {
 }
 
 .bot-header h2 {
-    margin: 0 0 5px;
+    margin: 0 0 8px;
 }
 
 .bot-header p {
@@ -102,11 +124,22 @@ main {
 ========================= */
 
 .status {
+    display: inline-block;
     background: #14532d;
     color: #86efac;
     padding: 8px 12px;
     border-radius: 20px;
     font-size: 14px;
+}
+
+.status.offline {
+    background: #450a0a;
+    color: #fca5a5;
+}
+
+.status.online {
+    background: #14532d;
+    color: #86efac;
 }
 
 /* =========================
@@ -135,6 +168,7 @@ main {
 
 .bot-info strong {
     font-size: 18px;
+    word-break: break-word;
 }
 
 /* =========================
@@ -172,6 +206,52 @@ button:active,
 }
 
 /* =========================
+   CONTROLES DU BOT
+========================= */
+
+.bot-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+}
+
+.bot-controls .main-button {
+    margin-top: 0;
+    flex: 1;
+    border: none;
+    cursor: pointer;
+}
+
+.start-button {
+    background: #16a34a;
+}
+
+.start-button:hover {
+    background: #15803d;
+}
+
+.restart-button {
+    background: #2563eb;
+}
+
+.restart-button:hover {
+    background: #1d4ed8;
+}
+
+.stop-button {
+    background: #dc2626;
+}
+
+.stop-button:hover {
+    background: #b91c1c;
+}
+
+.bot-controls button:disabled {
+    opacity: 0.6;
+    cursor: wait;
+}
+
+/* =========================
    ACTIONS RAPIDES
 ========================= */
 
@@ -203,6 +283,45 @@ button:active,
 
 .main-button:hover {
     background: #1d4ed8;
+}
+
+/* =========================
+   BOUTON SECONDAIRE
+========================= */
+
+.secondary-button {
+    padding: 10px 15px;
+    border: 1px solid #334155;
+    border-radius: 10px;
+    background: #0f172a;
+    color: #cbd5e1;
+    cursor: pointer;
+    font-size: 14px;
+    flex: none;
+}
+
+.secondary-button:hover {
+    background: #1e293b;
+    color: white;
+}
+
+/* =========================
+   ACTUALISATION
+========================= */
+
+.bot-refresh {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid #334155;
+}
+
+#last-update {
+    color: #94a3b8;
+    font-size: 14px;
 }
 
 /* =========================
@@ -326,7 +445,8 @@ footer {
         text-align: left;
     }
 
-    main {
+    main,
+    .container {
         padding: 20px 15px;
     }
 
@@ -355,10 +475,23 @@ footer {
         flex-direction: column;
     }
 
+    .bot-controls {
+        flex-direction: column;
+    }
+
     .bot-card,
     .quick-actions,
     .console-card {
         padding: 20px;
+    }
+
+    .bot-refresh {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .secondary-button {
+        width: 100%;
     }
 
     .console {
@@ -369,4 +502,4 @@ footer {
     .setting {
         align-items: flex-start;
     }
-}
+    }
