@@ -67,15 +67,16 @@
         </h1>
 
         <p>
-            Consulte les logs et les erreurs de ton bot.
+            Consulte les logs, les erreurs et les solutions de ton bot.
         </p>
 
     </section>
 
 
 
-    <section class="bot-card">
+    <!-- STATUT -->
 
+    <section class="bot-card">
 
         <div class="bot-header">
 
@@ -98,9 +99,14 @@
 
 
 
+        <!-- DIAGNOSTIC -->
+
         <div
-            id="error-box"
-            style="display:none; margin-top:20px;"
+            id="diagnostic-box"
+            style="
+                display:none;
+                margin-top:20px;
+            "
         >
 
             <div class="info-box">
@@ -109,8 +115,59 @@
                     🔴 Problème détecté
                 </span>
 
-                <strong id="error-message">
-                    Aucune erreur
+                <strong
+                    id="diagnostic-problem"
+                    style="
+                        display:block;
+                        margin-top:8px;
+                    "
+                >
+                </strong>
+
+            </div>
+
+
+
+            <div
+                class="info-box"
+                style="margin-top:12px;"
+            >
+
+                <span>
+                    💡 Explication
+                </span>
+
+                <strong
+                    id="diagnostic-explanation"
+                    style="
+                        display:block;
+                        margin-top:8px;
+                        font-weight:normal;
+                    "
+                >
+                </strong>
+
+            </div>
+
+
+
+            <div
+                class="info-box"
+                style="margin-top:12px;"
+            >
+
+                <span>
+                    🔧 Solution
+                </span>
+
+                <strong
+                    id="diagnostic-solution"
+                    style="
+                        display:block;
+                        margin-top:8px;
+                        font-weight:normal;
+                    "
+                >
                 </strong>
 
             </div>
@@ -118,6 +175,40 @@
         </div>
 
 
+
+        <!-- ERREUR ORIGINALE -->
+
+        <div
+            id="error-box"
+            style="
+                display:none;
+                margin-top:12px;
+            "
+        >
+
+            <div class="info-box">
+
+                <span>
+                    📋 Message d'erreur original
+                </span>
+
+                <pre
+                    id="error-message"
+                    style="
+                        margin-top:10px;
+                        white-space:pre-wrap;
+                        word-break:break-word;
+                        font-family:monospace;
+                    "
+                ></pre>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- CONSOLE -->
 
         <div
             id="console-output"
@@ -139,6 +230,8 @@
         </div>
 
 
+
+        <!-- BOUTONS -->
 
         <div
             class="bot-controls"
@@ -181,6 +274,431 @@
 <script src="script.js"></script>
 
 
+<script>
+
+
+// =========================
+// DIAGNOSTIC DES ERREURS
+// =========================
+
+function analyserErreur(error) {
+
+    if (!error) {
+
+        return null;
+
+    }
+
+
+    const erreur =
+        error.toLowerCase();
+
+
+    // =========================
+    // TOKEN DISCORD
+    // =========================
+
+    if (
+        erreur.includes("improper token") ||
+        erreur.includes("invalid token") ||
+        erreur.includes("token has been passed")
+    ) {
+
+        return {
+
+            problem:
+                "Token Discord invalide",
+
+            explanation:
+                "Discord refuse le token utilisé par Lunex. Le token peut être incorrect, expiré ou mal configuré.",
+
+            solution:
+                "Vérifie la variable DISCORD_TOKEN dans Render. Ne mets jamais le token directement dans GitHub."
+
+        };
+
+    }
+
+
+    // =========================
+    // TOKEN ABSENT
+    // =========================
+
+    if (
+        erreur.includes("dis_token") ||
+        erreur.includes("token") &&
+        erreur.includes("not configured")
+    ) {
+
+        return {
+
+            problem:
+                "Token Discord absent",
+
+            explanation:
+                "Lunex ne trouve pas la variable d'environnement nécessaire pour se connecter à Discord.",
+
+            solution:
+                "Ajoute ou vérifie DISCORD_TOKEN dans les variables d'environnement de Render."
+
+        };
+
+    }
+
+
+    // =========================
+    // MODULE MANQUANT
+    // =========================
+
+    if (
+        erreur.includes("modulenotfounderror")
+    ) {
+
+        let module =
+            "une bibliothèque Python";
+
+
+        const match =
+            error.match(
+                /No module named ['"]([^'"]+)['"]/
+            );
+
+
+        if (match) {
+
+            module =
+                match[1];
+
+        }
+
+
+        return {
+
+            problem:
+                `Bibliothèque Python manquante : ${module}`,
+
+            explanation:
+                `Python ne trouve pas la bibliothèque ${module} nécessaire au fonctionnement du bot.`,
+
+            solution:
+                "Vérifie requirements.txt, ajoute la bibliothèque nécessaire puis redéploie BotHost sur Render."
+
+        };
+
+    }
+
+
+    // =========================
+    // FICHIER INTROUVABLE
+    // =========================
+
+    if (
+        erreur.includes("filenotfounderror") ||
+        erreur.includes("bot.py introuvable") ||
+        erreur.includes("no such file or directory")
+    ) {
+
+        return {
+
+            problem:
+                "Fichier introuvable",
+
+            explanation:
+                "BotHost ou Python essaie d'utiliser un fichier qui n'existe pas à l'emplacement attendu.",
+
+            solution:
+                "Vérifie le chemin du fichier et assure-toi que Bot.py se trouve dans backend/bots/Lunex/."
+
+        };
+
+    }
+
+
+    // =========================
+    // ERREUR PYTHON
+    // =========================
+
+    if (
+        erreur.includes("syntaxerror")
+    ) {
+
+        return {
+
+            problem:
+                "Erreur de syntaxe Python",
+
+            explanation:
+                "Python ne comprend pas une partie du code de Bot.py.",
+
+            solution:
+                "Vérifie la ligne indiquée dans le message d'erreur et corrige la syntaxe Python."
+
+        };
+
+    }
+
+
+    // =========================
+    // INDENTATION
+    // =========================
+
+    if (
+        erreur.includes("indentationerror") ||
+        erreur.includes("unexpected indent")
+    ) {
+
+        return {
+
+            problem:
+                "Erreur d'indentation",
+
+            explanation:
+                "Certaines lignes de code Python ne sont pas correctement alignées.",
+
+            solution:
+                "Vérifie les espaces et les tabulations autour de la ligne indiquée."
+
+        };
+
+    }
+
+
+    // =========================
+    // DISCORD INTENTS
+    // =========================
+
+    if (
+        erreur.includes("privileged intent") ||
+        erreur.includes("message content intent")
+    ) {
+
+        return {
+
+            problem:
+                "Intent Discord non autorisé",
+
+            explanation:
+                "Lunex demande un accès Discord qui n'est pas activé pour l'application.",
+
+            solution:
+                "Va dans le Discord Developer Portal et vérifie les intents privilégiés utilisés par ton bot."
+
+        };
+
+    }
+
+
+    // =========================
+    // CONNEXION DISCORD
+    // =========================
+
+    if (
+        erreur.includes("connection") ||
+        erreur.includes("connection reset") ||
+        erreur.includes("connection refused")
+    ) {
+
+        return {
+
+            problem:
+                "Problème de connexion",
+
+            explanation:
+                "Lunex rencontre un problème pour communiquer avec un service réseau.",
+
+            solution:
+                "Vérifie la connexion du serveur Render et consulte les logs pour voir si le problème se répète."
+
+        };
+
+    }
+
+
+    // =========================
+    // ERREUR DISCORD
+    // =========================
+
+    if (
+        erreur.includes("discord.errors")
+    ) {
+
+        return {
+
+            problem:
+                "Erreur Discord",
+
+            explanation:
+                "La bibliothèque Discord.py a rencontré un problème lors de l'exécution du bot.",
+
+            solution:
+                "Regarde le message d'erreur original ci-dessous pour identifier précisément la cause."
+
+        };
+
+    }
+
+
+    // =========================
+    // ERREUR INCONNUE
+    // =========================
+
+    return {
+
+        problem:
+            "Erreur non reconnue",
+
+        explanation:
+            "BotHost a détecté une erreur, mais elle ne correspond pas encore à un problème connu.",
+
+        solution:
+            "Envoie-moi le message d'erreur original affiché ci-dessous afin que nous puissions ajouter son diagnostic à BotHost."
+
+    };
+
+}
+
+
+// =========================
+// AFFICHAGE DIAGNOSTIC
+// =========================
+
+async function afficherDiagnostic() {
+
+    try {
+
+        const response =
+            await fetch(
+                "https://bothost-pz1h.onrender.com/api/logs"
+            );
+
+
+        if (!response.ok) {
+
+            return;
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const diagnosticBox =
+            document.querySelector(
+                "#diagnostic-box"
+            );
+
+        const errorBox =
+            document.querySelector(
+                "#error-box"
+            );
+
+
+        const problem =
+            document.querySelector(
+                "#diagnostic-problem"
+            );
+
+        const explanation =
+            document.querySelector(
+                "#diagnostic-explanation"
+            );
+
+        const solution =
+            document.querySelector(
+                "#diagnostic-solution"
+            );
+
+        const errorMessage =
+            document.querySelector(
+                "#error-message"
+            );
+
+
+        if (!data.error) {
+
+            diagnosticBox.style.display =
+                "none";
+
+            errorBox.style.display =
+                "none";
+
+            return;
+
+        }
+
+
+        const diagnostic =
+            analyserErreur(
+                data.error
+            );
+
+
+        if (!diagnostic) {
+
+            return;
+
+        }
+
+
+        diagnosticBox.style.display =
+            "block";
+
+        errorBox.style.display =
+            "block";
+
+
+        problem.textContent =
+            diagnostic.problem;
+
+
+        explanation.textContent =
+            diagnostic.explanation;
+
+
+        solution.textContent =
+            diagnostic.solution;
+
+
+        errorMessage.textContent =
+            data.error;
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Erreur diagnostic :",
+            error
+        );
+
+    }
+
+}
+
+
+// =========================
+// LANCEMENT
+// =========================
+
+document.addEventListener(
+    "DOMContentLoaded",
+    () => {
+
+        afficherDiagnostic();
+
+
+        setInterval(
+            afficherDiagnostic,
+            3000
+        );
+
+    }
+);
+
+</script>
+
+
 </body>
 
-    </html>
+                    </html>
